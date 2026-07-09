@@ -1,0 +1,473 @@
+/* ============================================================================
+ * ГеоСтолицы — стили. Тёмная минималистичная тема, адаптивная вёрстка.
+ * ========================================================================== */
+
+:root {
+  --bg:            #0e131c;
+  --bg-2:          #121a26;
+  --panel:         #172233;
+  --panel-2:       #1e2b40;
+  --border:        #263449;
+  --text:          #e7edf5;
+  --muted:         #8a99ad;
+  --accent:        #4f8cff;
+  --accent-strong: #3a76e0;
+
+  --country-default: #3a4a61;
+  --country-hover:   #4c6183;
+  --ocean:           #0b1017;
+
+  --c-green:  #2ecc71;
+  --c-orange: #f5a623;
+  --c-red:    #e94b4b;
+  --c-select: #4f8cff;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: radial-gradient(1200px 800px at 70% -10%, #16233a 0%, var(--bg) 55%);
+  color: var(--text);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100%;
+}
+
+#app { min-height: 100vh; }
+
+/* ---------- Экраны ---------- */
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ============================================================================
+ * ЭКРАН ВЫБОРА РЕЖИМА
+ * ========================================================================== */
+#screen-mode {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+
+.brand {
+  text-align: center;
+  margin-bottom: 8px;
+}
+.brand h1 {
+  font-size: clamp(28px, 5vw, 44px);
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #7fb0ff, #4f8cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.brand p {
+  color: var(--muted);
+  margin: 0 auto;
+  max-width: 560px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.section-title {
+  margin: 40px 0 16px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 18px 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.mode-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+.mode-title { font-size: 17px; font-weight: 600; }
+.mode-count { font-size: 13px; color: var(--muted); }
+
+/* ---------- Свой набор ---------- */
+#custom-panel {
+  margin-top: 28px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.custom-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.custom-head h3 { margin: 0; font-size: 18px; }
+.custom-actions { display: flex; gap: 10px; align-items: center; }
+.custom-actions .muted { color: var(--muted); font-size: 14px; }
+
+.custom-group { margin-bottom: 18px; }
+.custom-group h4 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 6px 14px;
+}
+.custom-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+}
+.custom-item:hover { background: var(--panel-2); }
+.custom-item input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+/* ============================================================================
+ * ИГРОВОЙ ЭКРАН
+ * ========================================================================== */
+#screen-game {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 16px 40px;
+  min-height: 100vh;
+  flex-direction: column;
+}
+/* display задаём только для активного экрана: иначе id-селектор
+   (#screen-game) перебивал бы .screen { display:none } и карта была бы
+   видна ещё на экране выбора режима. */
+#screen-game.active { display: flex; }
+
+.game-header {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+
+.hud-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.country-name {
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+
+.hud-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.stat {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.stat span:last-child { font-size: 20px; font-weight: 700; }
+.stat-green  span:last-child { color: var(--c-green); }
+.stat-orange span:last-child { color: var(--c-orange); }
+.stat-red    span:last-child { color: var(--c-red); }
+
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+#capital-input {
+  flex: 1 1 260px;
+  min-width: 0;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+#capital-input:focus { border-color: var(--accent); }
+#capital-input:disabled { opacity: 0.6; }
+
+.btn {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--panel-2);
+  transition: transform 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:disabled { opacity: 0.5; cursor: default; transform: none; }
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  border-color: transparent;
+}
+.btn-ghost { background: transparent; }
+
+.hint {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted);
+  min-height: 20px;
+  text-align: center;
+  transition: color 0.2s ease;
+}
+.hint-green  { color: var(--c-green); font-weight: 600; }
+.hint-orange { color: var(--c-orange); font-weight: 600; }
+.hint-red    { color: var(--c-red); font-weight: 600; }
+
+/* ---------- Карта ---------- */
+#map-container {
+  position: relative;
+  margin-top: 16px;
+  background: var(--ocean);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+#map-container svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;          /* свои жесты зума/панорамирования */
+  cursor: grab;
+  user-select: none;
+}
+#map-container svg:active { cursor: grabbing; }
+
+/* Панель управления масштабом */
+.map-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.map-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text);
+  background: rgba(23, 34, 51, 0.82);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+.map-btn:hover { background: var(--panel-2); transform: translateY(-1px); }
+.map-btn:active { transform: none; }
+
+/* Базовый вид стран */
+#map-container svg path {
+  fill: var(--country-default);
+  stroke: var(--ocean);
+  stroke-width: 0.35;
+  transition: fill 0.5s ease;
+  cursor: pointer;
+}
+#map-container svg path:hover { fill: var(--country-hover); }
+
+/* Состояния — !important, чтобы перекрыть базовое правило со #id.
+   Дублируем селектор для стран из нескольких путей (<g id> + вложенные path). */
+#map-container svg .c-selected,
+#map-container svg .c-selected path { fill: var(--c-select) !important; }
+
+#map-container svg .c-green,
+#map-container svg .c-green path { fill: var(--c-green) !important; }
+
+#map-container svg .c-orange,
+#map-container svg .c-orange path { fill: var(--c-orange) !important; }
+
+#map-container svg .c-red,
+#map-container svg .c-red path { fill: var(--c-red) !important; }
+
+#map-container svg .c-flash,
+#map-container svg .c-flash path {
+  fill: var(--c-red) !important;
+  animation: flash 0.65s ease;
+}
+@keyframes flash {
+  0%, 100% { fill: var(--c-red) !important; }
+  50%      { fill: #ff9a9a !important; }
+}
+
+/* Подпись на карте */
+.map-label {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #0a0f16;
+  stroke-width: 1.4px;
+  stroke-linejoin: round;
+  pointer-events: none;
+  animation: label-in 0.3s ease;
+}
+.map-label-green  { fill: var(--c-green); }
+.map-label-orange { fill: var(--c-orange); }
+.map-label-red    { fill: var(--c-red); }
+@keyframes label-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ============================================================================
+ * ФИНАЛЬНЫЙ ЭКРАН
+ * ========================================================================== */
+#screen-final {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px 80px;
+}
+.final-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.final-card h1 { margin: 0 0 4px; font-size: 30px; }
+.final-score {
+  font-size: 56px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #7fb0ff, #4f8cff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 8px 0 4px;
+}
+.final-score-label { color: var(--muted); font-size: 14px; }
+
+.final-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 26px 0;
+}
+.final-stat {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+}
+.final-stat .num { font-size: 26px; font-weight: 800; }
+.final-stat .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.final-stat.green  .num { color: var(--c-green); }
+.final-stat.orange .num { color: var(--c-orange); }
+.final-stat.red    .num { color: var(--c-red); }
+.final-stat.pct    .num { color: var(--accent); }
+
+.review { text-align: left; margin-top: 8px; }
+.review h2 {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+#review-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 320px; overflow: auto; }
+.review-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+}
+.review-item.review-red    { border-left-color: var(--c-red); }
+.review-item.review-orange { border-left-color: var(--c-orange); }
+.review-country { font-weight: 600; }
+.review-capital { color: var(--muted); }
+.review-perfect { color: var(--c-green); font-weight: 600; padding: 12px 0; }
+
+#btn-again { margin-top: 26px; width: 100%; padding: 14px; font-size: 16px; }
+
+/* ============================================================================
+ * АДАПТИВНОСТЬ
+ * ========================================================================== */
+@media (max-width: 640px) {
+  .hud-stats { grid-template-columns: repeat(3, 1fr); }
+  .stat:nth-child(1), .stat:nth-child(2) { grid-column: span 1; }
+  .controls { flex-direction: column; }
+  .btn { width: 100%; }
+  .final-grid { grid-template-columns: repeat(2, 1fr); }
+  .map-label { font-size: 9px; }
+  .map-controls { top: 12px; right: 12px; gap: 6px; }
+  .map-btn { width: 34px; height: 34px; font-size: 19px; }
+}
+
+@media (max-width: 400px) {
+  .hud-stats { grid-template-columns: repeat(2, 1fr); }
+}
