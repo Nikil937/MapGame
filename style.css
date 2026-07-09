@@ -115,52 +115,6 @@ body {
 .mode-title { font-size: 17px; font-weight: 600; }
 .mode-count { font-size: 13px; color: var(--muted); }
 
-/* ---------- Свой набор ---------- */
-#custom-panel {
-  margin-top: 28px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-}
-.custom-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.custom-head h3 { margin: 0; font-size: 18px; }
-.custom-actions { display: flex; gap: 10px; align-items: center; }
-.custom-actions .muted { color: var(--muted); font-size: 14px; }
-
-.custom-group { margin-bottom: 18px; }
-.custom-group h4 {
-  margin: 0 0 10px;
-  font-size: 13px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-}
-.custom-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 6px 14px;
-}
-.custom-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  padding: 5px 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--text);
-}
-.custom-item:hover { background: var(--panel-2); }
-.custom-item input { accent-color: var(--accent); width: 16px; height: 16px; }
-
 /* ============================================================================
  * ИГРОВОЙ ЭКРАН
  * ========================================================================== */
@@ -229,21 +183,6 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
-#capital-input {
-  flex: 1 1 260px;
-  min-width: 0;
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
-  color: var(--text);
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-#capital-input:focus { border-color: var(--accent); }
-#capital-input:disabled { opacity: 0.6; }
-
 .btn {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -274,6 +213,58 @@ body {
 .hint-green  { color: var(--c-green); font-weight: 600; }
 .hint-orange { color: var(--c-orange); font-weight: 600; }
 .hint-red    { color: var(--c-red); font-weight: 600; }
+
+/* ---------- Ответ под картой ---------- */
+.answer-panel {
+  margin-top: 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+.answer-panel .hint { margin-top: 0; margin-bottom: 12px; }
+
+/* ---------- Варианты столицы ---------- */
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.option-btn {
+  padding: 13px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.option-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+.option-btn:disabled { cursor: default; }
+.option-btn.selected {
+  border-color: var(--accent);
+  background: rgba(79, 140, 255, 0.20);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+.option-btn.correct {
+  background: rgba(46, 204, 113, 0.20);
+  border-color: var(--c-green);
+  color: #fff;
+}
+.option-btn.wrong {
+  background: rgba(233, 75, 75, 0.20);
+  border-color: var(--c-red);
+  color: #fff;
+}
 
 /* ---------- Карта ---------- */
 #map-container {
@@ -334,7 +325,10 @@ body {
   transition: fill 0.5s ease;
   cursor: pointer;
 }
-#map-container svg path:hover { fill: var(--country-hover); }
+/* Наведение: одиночные страны (<path id>) и страны из группы (<g id>).
+   g[id] исключает внешнюю обёртку <g> без id, иначе подсветилась бы вся карта. */
+#map-container svg path:hover,
+#map-container svg g[id]:hover path { fill: var(--country-hover); }
 
 /* Состояния — !important, чтобы перекрыть базовое правило со #id.
    Дублируем селектор для стран из нескольких путей (<g id> + вложенные path). */
@@ -462,6 +456,7 @@ body {
   .stat:nth-child(1), .stat:nth-child(2) { grid-column: span 1; }
   .controls { flex-direction: column; }
   .btn { width: 100%; }
+  .options-grid { grid-template-columns: repeat(2, 1fr); }
   .final-grid { grid-template-columns: repeat(2, 1fr); }
   .map-label { font-size: 9px; }
   .map-controls { top: 12px; right: 12px; gap: 6px; }

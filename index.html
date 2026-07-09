@@ -19,19 +19,6 @@
 
     <div class="section-title">Выберите режим</div>
     <div id="mode-list" class="mode-grid"><!-- кнопки режимов генерируются в script.js --></div>
-
-    <!-- Свой набор -->
-    <div id="custom-panel" hidden>
-      <div class="custom-head">
-        <h3>Свой набор стран</h3>
-        <div class="custom-actions">
-          <span class="muted">Выбрано: <b id="custom-count">0</b></span>
-          <button id="custom-cancel" class="btn btn-ghost">Отмена</button>
-          <button id="custom-start" class="btn btn-primary" disabled>Начать</button>
-        </div>
-      </div>
-      <div id="custom-list"><!-- чекбоксы стран генерируются в script.js --></div>
-    </div>
   </section>
 
   <!-- ============================ ИГРОВОЙ ЭКРАН ============================ -->
@@ -50,12 +37,8 @@
       </div>
 
       <div class="controls">
-        <input id="capital-input" type="text" placeholder="Введите столицу…" autocomplete="off" autocapitalize="off" spellcheck="false">
-        <button id="btn-check" class="btn btn-primary">Проверить</button>
         <button id="btn-reset" class="btn btn-ghost">Сбросить игру</button>
       </div>
-
-      <div class="hint" id="hint">Кликните страну на карте и введите её столицу</div>
     </header>
 
     <div id="map-container">
@@ -472,6 +455,11 @@
 </g>
 </svg>
     </div><!-- /#map-container -->
+
+    <div class="answer-panel">
+      <div class="hint" id="hint">Отметьте страну на карте и выберите её столицу</div>
+      <div id="capital-options" class="options-grid"><!-- варианты столицы генерируются в script.js --></div>
+    </div>
   </section>
 
   <!-- ============================ ФИНАЛЬНЫЙ ЭКРАН ========================== -->

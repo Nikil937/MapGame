@@ -72,7 +72,8 @@ const COUNTRIES = [
   { country: 'Бангладеш',      capital: 'Дакка',       iso: 'BD', continent: 'Азия', capitalAliases: ['Dhaka'] },
   { country: 'Непал',          capital: 'Катманду',    iso: 'NP', continent: 'Азия', capitalAliases: ['Kathmandu'] },
   { country: 'Бутан',          capital: 'Тхимпху',     iso: 'BT', continent: 'Азия', capitalAliases: ['Thimphu'] },
-  { country: 'Шри-Ланка',      capital: 'Коломбо',     iso: 'LK', continent: 'Азия', capitalAliases: ['Colombo', 'Шри-Джаяварденепура-Котте', 'Sri Jayawardenepura Kotte'] },
+  { country: 'Шри-Ланка',      capital: 'Шри-Джаяварденепура-Котте', iso: 'LK', continent: 'Азия', capitalAliases: ['Sri Jayawardenepura Kotte', 'Коломбо', 'Colombo'] },
+  { country: 'Мальдивы',       capital: 'Мале',        iso: 'MV', continent: 'Азия', capitalAliases: ['Male'] },
   { country: 'Мьянма',         capital: 'Нейпьидо',    iso: 'MM', continent: 'Азия', capitalAliases: ['Naypyidaw', 'Нейпьидав'] },
   { country: 'Таиланд',        capital: 'Бангкок',     iso: 'TH', continent: 'Азия', capitalAliases: ['Bangkok'] },
   { country: 'Камбоджа',       capital: 'Пномпень',    iso: 'KH', continent: 'Азия', capitalAliases: ['Phnom Penh'] },
@@ -182,6 +183,7 @@ const COUNTRIES = [
   { country: 'Доминика',       capital: 'Розо',        iso: 'DM', continent: 'Северная Америка', capitalAliases: ['Roseau'] },
   { country: 'Сент-Люсия',     capital: 'Кастри',      iso: 'LC', continent: 'Северная Америка', capitalAliases: ['Castries'] },
   { country: 'Сент-Винсент и Гренадины', capital: 'Кингстаун', iso: 'VC', continent: 'Северная Америка', capitalAliases: ['Kingstown'] },
+  { country: 'Тринидад и Тобаго', capital: 'Порт-оф-Спейн', iso: 'TT', continent: 'Северная Америка', capitalAliases: ['Port of Spain', 'Порт-оф-Спен'] },
 
   /* ---------- Южная Америка ---------- */
   { country: 'Бразилия',       capital: 'Бразилиа',    iso: 'BR', continent: 'Южная Америка', capitalAliases: ['Brasilia', 'Бразилья'] },
@@ -207,23 +209,16 @@ const COUNTRIES = [
 
 /* ----------------------------------------------------------------------------
  * 2. РЕЖИМЫ ИГРЫ
- *    Каждый режим — предикат по стране. "Свой набор" обрабатывается отдельно.
+ *    Каждый режим — предикат по стране.
  * -------------------------------------------------------------------------- */
-const CONTINENTS = ['Европа', 'Азия', 'Африка', 'Северная Америка', 'Южная Америка', 'Океания'];
-
 const MODES = [
-  { key: 'europe',        title: 'Европа',              filter: c => c.continent === 'Европа' },
-  { key: 'asia',          title: 'Азия',                filter: c => c.continent === 'Азия' },
-  { key: 'africa',        title: 'Африка',              filter: c => c.continent === 'Африка' },
-  { key: 'north-america', title: 'Северная Америка',    filter: c => c.continent === 'Северная Америка' },
-  { key: 'south-america', title: 'Южная Америка',       filter: c => c.continent === 'Южная Америка' },
-  { key: 'oceania',       title: 'Океания',             filter: c => c.continent === 'Океания' },
-  { key: 'world',         title: 'Весь мир',            filter: () => true },
-  { key: 'world-no-africa', title: 'Весь мир без Африки', filter: c => c.continent !== 'Африка' },
-  { key: 'world-no-europe', title: 'Весь мир без Европы', filter: c => c.continent !== 'Европа' },
-  { key: 'eurasia',       title: 'Европа + Азия',       filter: c => c.continent === 'Европа' || c.continent === 'Азия' },
-  { key: 'americas',      title: 'Америка',             filter: c => c.continent === 'Северная Америка' || c.continent === 'Южная Америка' },
-  { key: 'custom',        title: 'Свой набор',          filter: null },
+  { key: 'europe',        title: 'Европа',           filter: c => c.continent === 'Европа' },
+  { key: 'asia',          title: 'Азия',             filter: c => c.continent === 'Азия' },
+  { key: 'africa',        title: 'Африка',           filter: c => c.continent === 'Африка' },
+  { key: 'north-america', title: 'Северная Америка', filter: c => c.continent === 'Северная Америка' },
+  { key: 'south-america', title: 'Южная Америка',    filter: c => c.continent === 'Южная Америка' },
+  { key: 'oceania',       title: 'Океания',          filter: c => c.continent === 'Океания' },
+  { key: 'world',         title: 'Весь мир',         filter: () => true },
 ];
 
 const POINTS = { green: 100, orange: 40, red: 0 };
@@ -240,6 +235,7 @@ const state = {
   counts: { green: 0, orange: 0, red: 0 },
   results: [],        // [{country, result}] по порядку прохождения
   selectedIso: null,  // страна, выбранная кликом на карте (в верхнем регистре)
+  capitalChosen: null,// выбранный вариант столицы (ещё не подтверждён)
   answering: false,   // блокировка ввода во время перехода к следующей стране
   inGame: false,      // идёт ли игра (разрешён ли выбор страны на карте)
   finished: false,
@@ -269,12 +265,143 @@ function shuffle(arr) {
   return a;
 }
 
-// Правильно ли введена столица для страны.
-function isCapitalCorrect(country, input) {
-  const value = normalize(input);
-  if (!value) return false;
-  const variants = [country.capital, ...country.capitalAliases];
-  return variants.some(v => normalize(v) === value);
+// Перемешивание массива (для вариантов ответа). Возвращает новый массив.
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ---- Генерация вариантов ответа для столицы ---- */
+
+// Множество всех реальных столиц (и их алиасов) — чтобы искажения
+// случайно не совпали с настоящей столицей другой страны.
+const REAL_CAPITALS = (() => {
+  const set = new Set();
+  COUNTRIES.forEach(c => {
+    set.add(normalize(c.capital));
+    c.capitalAliases.forEach(a => set.add(normalize(a)));
+  });
+  return set;
+})();
+
+const VOWELS = 'аеёиоуыэюя';
+const CONS_PAIRS = {
+  'п': 'б', 'б': 'п', 'с': 'з', 'з': 'с', 'т': 'д', 'д': 'т',
+  'к': 'г', 'г': 'к', 'ж': 'ш', 'ш': 'ж', 'в': 'ф', 'ф': 'в',
+  'л': 'р', 'р': 'л', 'м': 'н', 'н': 'м', 'х': 'к', 'ц': 'ч', 'ч': 'ц',
+};
+
+function ri(n) { return Math.floor(Math.random() * n); }
+function isSep(ch) { return ch === '-' || ch === ' '; }
+
+// Каждое слово с заглавной, остальное строчными (как в «Нью-Дели»),
+// чтобы искажения выглядели ровно и не выдавали ответ регистром букв.
+function titleCase(s) {
+  let out = '', cap = true;
+  for (const ch of s) {
+    if (isSep(ch)) { out += ch; cap = true; }
+    else { out += cap ? ch.toUpperCase() : ch.toLowerCase(); cap = false; }
+  }
+  return out;
+}
+
+// Заменить символ на позиции i, сохранив регистр исходного символа.
+function replaceAt(s, i, ch) {
+  const orig = s[i];
+  const isUpper = orig === orig.toUpperCase() && orig !== orig.toLowerCase();
+  return s.slice(0, i) + (isUpper ? ch.toUpperCase() : ch) + s.slice(i + 1);
+}
+
+// Набор искажающих преобразований. Каждое возвращает строку или null.
+const TRANSFORMS = [
+  function swap(s) {                       // переставить две соседние буквы
+    for (let t = 0; t < 6; t++) {
+      const i = ri(Math.max(1, s.length - 1));
+      if (i + 1 < s.length && !isSep(s[i]) && !isSep(s[i + 1])) {
+        return s.slice(0, i) + s[i + 1] + s[i] + s.slice(i + 2);
+      }
+    }
+    return null;
+  },
+  function replaceVowel(s) {               // заменить гласную на другую гласную
+    const idx = [];
+    for (let i = 0; i < s.length; i++) if (VOWELS.includes(s[i].toLowerCase())) idx.push(i);
+    if (!idx.length) return null;
+    const i = idx[ri(idx.length)];
+    let v; do { v = VOWELS[ri(VOWELS.length)]; } while (v === s[i].toLowerCase());
+    return replaceAt(s, i, v);
+  },
+  function replaceCons(s) {                // заменить согласную на похожую
+    const idx = [];
+    for (let i = 0; i < s.length; i++) if (CONS_PAIRS[s[i].toLowerCase()]) idx.push(i);
+    if (!idx.length) return null;
+    const i = idx[ri(idx.length)];
+    return replaceAt(s, i, CONS_PAIRS[s[i].toLowerCase()]);
+  },
+  function drop(s) {                        // выбросить букву
+    if (s.length < 4) return null;
+    for (let t = 0; t < 6; t++) {
+      const i = 1 + ri(s.length - 1);
+      if (!isSep(s[i])) return s.slice(0, i) + s.slice(i + 1);
+    }
+    return null;
+  },
+  function double(s) {                      // удвоить букву
+    for (let t = 0; t < 6; t++) {
+      const i = ri(s.length);
+      if (!isSep(s[i])) return s.slice(0, i + 1) + s[i] + s.slice(i + 1);
+    }
+    return null;
+  },
+  function ending(s) {                      // сменить окончание
+    const suf = ['а', 'я', 'ск', 'е', 'ов', 'о', 'ы', 'и', 'ин'];
+    let base = s;
+    if (VOWELS.includes(base[base.length - 1].toLowerCase())) base = base.slice(0, -1);
+    return base + suf[ri(suf.length)];
+  },
+];
+
+// 7 непохожих друг на друга искажений столицы, не являющихся реальными столицами.
+function generateDistractors(capital, count) {
+  const out = [];
+  const seen = new Set([normalize(capital)]);
+  let attempts = 0;
+
+  while (out.length < count && attempts < 800) {
+    attempts++;
+    let d = TRANSFORMS[ri(TRANSFORMS.length)](capital);
+    if (!d) continue;
+    if (Math.random() < 0.35) {            // иногда второе преобразование
+      const d2 = TRANSFORMS[ri(TRANSFORMS.length)](d);
+      if (d2) d = d2;
+    }
+    d = titleCase(d);
+    const nd = normalize(d);
+    if (nd.length < 2 || seen.has(nd) || REAL_CAPITALS.has(nd)) continue;
+    seen.add(nd);
+    out.push(d);
+  }
+
+  // Гарантируем нужное количество на случай очень коротких названий.
+  const suffixes = ['а', 'я', 'ск', 'ов', 'е', 'о', 'ы', 'и', 'ин', 'град', 'бург'];
+  for (let i = 0; out.length < count && i < suffixes.length * 2; i++) {
+    const d = titleCase(capital + suffixes[i % suffixes.length]);
+    const nd = normalize(d);
+    if (seen.has(nd) || REAL_CAPITALS.has(nd)) continue;
+    seen.add(nd);
+    out.push(d);
+  }
+  return out.slice(0, count);
+}
+
+// Массив из 8 вариантов: правильная столица + 7 искажений, перемешанные.
+function buildCapitalOptions(country) {
+  const options = [country.capital, ...generateDistractors(country.capital, 7)];
+  return shuffleArray(options);
 }
 
 /* ----------------------------------------------------------------------------
@@ -455,6 +582,7 @@ const map = {
     state.selectedIso = iso;
     const el = this.el(iso);
     if (el) el.classList.add('c-selected');
+    maybeSubmit();
   },
 
   clearSelection() {
@@ -528,11 +656,6 @@ function cacheDom() {
     final: document.getElementById('screen-final'),
   };
   dom.modeList     = document.getElementById('mode-list');
-  dom.customPanel  = document.getElementById('custom-panel');
-  dom.customList   = document.getElementById('custom-list');
-  dom.customStart  = document.getElementById('custom-start');
-  dom.customCancel = document.getElementById('custom-cancel');
-  dom.customCount  = document.getElementById('custom-count');
 
   dom.countryName = document.getElementById('country-name');
   dom.progress    = document.getElementById('progress');
@@ -540,8 +663,7 @@ function cacheDom() {
   dom.cntGreen    = document.getElementById('cnt-green');
   dom.cntOrange   = document.getElementById('cnt-orange');
   dom.cntRed      = document.getElementById('cnt-red');
-  dom.input       = document.getElementById('capital-input');
-  dom.btnCheck    = document.getElementById('btn-check');
+  dom.options     = document.getElementById('capital-options');
   dom.btnReset    = document.getElementById('btn-reset');
   dom.hint        = document.getElementById('hint');
 
@@ -565,57 +687,15 @@ function showScreen(name) {
 function renderModeScreen() {
   dom.modeList.innerHTML = '';
   MODES.forEach(mode => {
-    const count = mode.filter ? COUNTRIES.filter(mode.filter).length : COUNTRIES.length;
+    const count = COUNTRIES.filter(mode.filter).length;
     const btn = document.createElement('button');
     btn.className = 'mode-card';
     btn.innerHTML =
       '<span class="mode-title">' + mode.title + '</span>' +
-      '<span class="mode-count">' + (mode.key === 'custom' ? 'выберите страны' : count + ' стран') + '</span>';
-    btn.addEventListener('click', () => {
-      if (mode.key === 'custom') openCustomPanel();
-      else startGame(COUNTRIES.filter(mode.filter));
-    });
+      '<span class="mode-count">' + count + ' стран</span>';
+    btn.addEventListener('click', () => startGame(COUNTRIES.filter(mode.filter)));
     dom.modeList.appendChild(btn);
   });
-}
-
-/* --- Свой набор --- */
-function openCustomPanel() {
-  dom.customList.innerHTML = '';
-  CONTINENTS.forEach(cont => {
-    const group = COUNTRIES.filter(c => c.continent === cont);
-    if (!group.length) return;
-    const wrap = document.createElement('div');
-    wrap.className = 'custom-group';
-    wrap.innerHTML = '<h4>' + cont + '</h4>';
-    const grid = document.createElement('div');
-    grid.className = 'custom-grid';
-    group.forEach(c => {
-      const label = document.createElement('label');
-      label.className = 'custom-item';
-      label.innerHTML =
-        '<input type="checkbox" value="' + c.iso + '"> ' +
-        '<span>' + c.country + '</span>';
-      grid.appendChild(label);
-    });
-    wrap.appendChild(grid);
-    dom.customList.appendChild(wrap);
-  });
-  updateCustomCount();
-  dom.customPanel.hidden = false;
-  dom.customPanel.scrollIntoView({ behavior: 'smooth' });
-}
-
-function updateCustomCount() {
-  const n = dom.customList.querySelectorAll('input:checked').length;
-  dom.customCount.textContent = n;
-  dom.customStart.disabled = n === 0;
-}
-
-function startCustomGame() {
-  const chosen = Array.from(dom.customList.querySelectorAll('input:checked')).map(i => i.value);
-  const set = COUNTRIES.filter(c => chosen.includes(c.iso));
-  if (set.length) startGame(set);
 }
 
 /* ----------------------------------------------------------------------------
@@ -633,7 +713,6 @@ function startGame(countryList) {
   state.finished = false;
 
   map.reset();
-  dom.customPanel.hidden = true;
   showScreen('game');
   updateHud();
   renderCurrent();
@@ -647,14 +726,12 @@ function renderCurrent() {
   const c = currentCountry();
   map.clearSelection();
   map.removeLabel();
+  state.capitalChosen = null;
   dom.countryName.textContent = c.country;
-  dom.input.value = '';
-  dom.input.disabled = false;
-  dom.btnCheck.disabled = false;
-  dom.hint.textContent = 'Кликните страну на карте и введите её столицу';
+  renderOptions(buildCapitalOptions(c));
+  dom.hint.textContent = 'Отметьте страну на карте и выберите её столицу';
   dom.hint.className = 'hint';
   updateHud();
-  dom.input.focus();
 }
 
 function updateHud() {
@@ -666,30 +743,55 @@ function updateHud() {
 }
 
 // Определяем результат по правилам ТЗ.
-function evaluate(country, selectedIso, input) {
+function evaluate(country, selectedIso, capitalRight) {
   const countryRight = selectedIso !== null && selectedIso === country.iso;
-  const capitalRight = isCapitalCorrect(country, input);
   if (countryRight && capitalRight) return 'green';
   if (countryRight || capitalRight) return 'orange';
   return 'red';
 }
 
-function checkAnswer() {
-  if (state.answering || state.finished) return;
+// Как только выбраны И страна на карте, И вариант столицы — проверяем.
+function maybeSubmit() {
+  if (state.answering || !state.inGame) return;
+  if (state.selectedIso !== null && state.capitalChosen !== null) submitAnswer();
+}
+
+// Игрок выбрал вариант столицы — помечаем его и, если страна уже отмечена, проверяем.
+function onSelectCapital(chosen, btnEl) {
+  if (state.answering || !state.inGame) return;
+  const prev = dom.options.querySelector('.option-btn.selected');
+  if (prev) prev.classList.remove('selected');
+  btnEl.classList.add('selected');
+  state.capitalChosen = chosen;
+  maybeSubmit();
+}
+
+// Проверка ответа: нужны и страна, и столица.
+function submitAnswer() {
+  if (state.answering || !state.inGame) return;
+  if (state.selectedIso === null || state.capitalChosen === null) return;
+
   const c = currentCountry();
   const selectedIso = state.selectedIso;
-  const input = dom.input.value;
-
-  const result = evaluate(c, selectedIso, input);
+  const capitalRight = normalize(state.capitalChosen) === normalize(c.capital);
+  const result = evaluate(c, selectedIso, capitalRight);
 
   state.answering = true;
-  dom.input.disabled = true;
-  dom.btnCheck.disabled = true;
+
+  // Блокируем варианты, подсвечиваем правильный и (если ошибка) выбранный.
+  const buttons = dom.options.querySelectorAll('.option-btn');
+  buttons.forEach(b => {
+    b.disabled = true;
+    b.classList.remove('selected');
+    if (normalize(b.textContent) === normalize(c.capital)) b.classList.add('correct');
+  });
+  if (!capitalRight) {
+    const chosenBtn = [...buttons].find(b => normalize(b.textContent) === normalize(state.capitalChosen));
+    if (chosenBtn) chosenBtn.classList.add('wrong');
+  }
 
   // Ошибочно выбранная страна коротко мигает красным.
-  if (selectedIso && selectedIso !== c.iso) {
-    map.flashWrong(selectedIso);
-  }
+  if (selectedIso && selectedIso !== c.iso) map.flashWrong(selectedIso);
   map.clearSelection();
 
   // Итоговый цвет получает именно правильная страна.
@@ -701,7 +803,6 @@ function checkAnswer() {
   state.counts[result] += 1;
   state.results.push({ country: c, result });
 
-  // Подсказка-результат.
   const hintText = {
     green:  'Верно! ' + c.country + ' — ' + c.capital,
     orange: 'Почти! ' + c.country + ' — ' + c.capital,
@@ -715,12 +816,22 @@ function checkAnswer() {
   setTimeout(() => {
     state.answering = false;
     state.index += 1;
-    if (state.index >= state.queue.length) {
-      finishGame();
-    } else {
-      renderCurrent();
-    }
+    if (state.index >= state.queue.length) finishGame();
+    else renderCurrent();
   }, NEXT_DELAY_MS);
+}
+
+// Отрисовка кнопок вариантов (уже перемешанных).
+function renderOptions(options) {
+  dom.options.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => onSelectCapital(opt, btn));
+    dom.options.appendChild(btn);
+  });
 }
 
 /* ----------------------------------------------------------------------------
@@ -781,16 +892,8 @@ function init() {
   map.init();
   renderModeScreen();
 
-  dom.btnCheck.addEventListener('click', checkAnswer);
-  dom.input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkAnswer();
-  });
   dom.btnReset.addEventListener('click', goToModeScreen);
   dom.btnAgain.addEventListener('click', goToModeScreen);
-
-  dom.customList.addEventListener('change', updateCustomCount);
-  dom.customStart.addEventListener('click', startCustomGame);
-  dom.customCancel.addEventListener('click', () => { dom.customPanel.hidden = true; });
 
   const zi = document.getElementById('zoom-in');
   const zo = document.getElementById('zoom-out');
